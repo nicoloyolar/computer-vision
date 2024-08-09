@@ -1,0 +1,17 @@
+METODOLOGÍAS ÁGILES 
+
+    - SCRUM
+    - KANBAN
+
+TO DO
+
+    - crear una lista de los destinatarios (luis)
+    - crear una lista de los CC (copia)
+    - conseguir cuenta de correo para entrega de mensajería (luis)
+    - integrar un sistema de visión sencillo en el programa principal 
+    - conseguir credenciales
+    - planificar reunion con cliente 
+
+DONE 
+
+    - establecer módulo de mensajería ✔

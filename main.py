@@ -1,7 +1,9 @@
-from computervission_2 import CorreoReporte
+from correoReporte import correoReporte
+
+email_test = ['nicolas.iloyolar@gmail.com', 'sanmaglass@gmail.com']
 
 def main():
-    reporte = CorreoReporte(destinatario='sanmaglass@gmail.com')
+    reporte = correoReporte(destinatario=email_test)
     reporte.enviar_correos()
 
 if __name__ == "__main__":
