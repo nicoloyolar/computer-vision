@@ -52,7 +52,7 @@ object_count = 0
 object_in_roi = False
 
 # Parámetros para la detección de contornos
-min_contour_area = 1000
+min_contour_area = 1200
 
 # Email destinatario
 destinatario = 'sanmaglass@gmail.com'
