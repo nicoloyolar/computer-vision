@@ -4,14 +4,22 @@ METODOLOGÍAS ÁGILES
     - KANBAN
 
 TO DO
-
-    - crear una lista de los destinatarios (luis)
-    - crear una lista de los CC (copia)
     - conseguir cuenta de correo para entrega de mensajería (luis)
-    - integrar un sistema de visión sencillo en el programa principal 
     - conseguir credenciales
     - planificar reunion con cliente 
 
 DONE 
 
     - establecer módulo de mensajería ✔
+    - integrar un sistema de visión sencillo en el programa principal ✔
+    - crear una lista de los destinatarios ✔
+    - crear una lista de los CC ✔
+
+
+
+    PD: 
+    - Se creó una interfaz basica con unos b otones sin acci ones momentameanmete , 
+    se pujede acceder a la camara en tiempo real y hay un boton donde nos permite
+    elegir si la region ROI está en umbralizacion, normal o escala de grises
+    - Se crearon las listas para los destinatarios y CC funcionando ambos 
+    - no he optimizado codigo aún , de eso necesito ayuda de Nicolas 

@@ -1,10 +1,16 @@
-from correoReporte import correoReporte
-
-email_test = ['nicolas.iloyolar@gmail.com', 'sanmaglass@gmail.com']
+from interfazCv import VideoProcessor
 
 def main():
-    reporte = correoReporte(destinatario=email_test)
-    reporte.enviar_correos()
+    rtsp_url = "rtsp://admin:admin123@192.168.31.108:554/cam/realmonitor?channel=5&subtype=0"
+    processor = VideoProcessor(rtsp_url=rtsp_url)
+
+    # Configurar la ROI (esto se puede ajustar según sea necesario)
+    processor.roi = (1228, 6, 1020, 1434)  # Coordenadas y dimensiones de la ROI conocidas
+
+    if processor.conectar_camara():
+        processor.iniciar_tkinter()
+
+    processor.liberar_recursos()
 
 if __name__ == "__main__":
     main()

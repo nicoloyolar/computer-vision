@@ -20,8 +20,8 @@ while True:
 
     # Convertir a escala de grises
     gray_frame = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2GRAY)
-
-    # unmbralizacion)
+    
+    # unmbralizacion)}
     _, thresh_frame = cv2.threshold(gray_frame, 128, 255, cv2.THRESH_BINARY)
 
     cv2.imshow("Video en Escala de Grises", gray_frame)
