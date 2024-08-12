@@ -4,9 +4,9 @@ METODOLOGÍAS ÁGILES
     - KANBAN
 
 TO DO
-    - conseguir cuenta de correo para entrega de mensajería (luis)
-    - conseguir credenciales
-    - planificar reunion con cliente 
+    - conseguir cuenta de correo para entrega de mensajería ( Luis: EN PROCESO PARA ESTA SEMANA)
+    - conseguir credenciales ( Esto no lo entendí")
+    - planificar reunion con cliente ( Luis: EN PROCESO PARA ESTA SEMANA")
 
 DONE 
 
@@ -18,7 +18,7 @@ DONE
 
 
     PD: 
-    - Se creó una interfaz basica con unos b otones sin acci ones momentameanmete , 
+    - Se creó una interfaz basica con unos botones sin acci ones momentameanmete , 
     se pujede acceder a la camara en tiempo real y hay un boton donde nos permite
     elegir si la region ROI está en umbralizacion, normal o escala de grises
     - Se crearon las listas para los destinatarios y CC funcionando ambos 

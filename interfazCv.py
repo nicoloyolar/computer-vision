@@ -50,7 +50,7 @@ class VideoProcessor:
         control_frame.pack(side=tk.LEFT, fill=tk.Y)
 
         # Agrega el logo de la empresa
-        logo_path = os.path.join("assets", "pngEmpresa.png")  # Asegúrate de que esta ruta es correcta
+        logo_path = os.path.join("assets", "logoStpng.png")  # Asegúrate de que esta ruta es correcta
         logo = Image.open(logo_path).resize((200, 100), Image.ANTIALIAS)
         logo = ImageTk.PhotoImage(logo)
         tk.Label(control_frame, image=logo, bg="#F4F4F4").pack(pady=10)
