@@ -23,3 +23,5 @@ DONE
     elegir si la region ROI está en umbralizacion, normal o escala de grises
     - Se crearon las listas para los destinatarios y CC funcionando ambos 
     - no he optimizado codigo aún , de eso necesito ayuda de Nicolas 
+    - Se estan creanndo frames de los prodcutos pasando por la cinta transportadora para poder entrenar
+    el modelo de detección.

@@ -24,7 +24,6 @@ class VideoProcessor(QMainWindow):
         main_layout = QHBoxLayout()
         control_layout = QVBoxLayout()
 
-        # logo
         logo_label = QLabel(self)
         pixmap = self.get_pixmap(self.get_icon_path(), 150, 75)
         if pixmap:
@@ -35,7 +34,6 @@ class VideoProcessor(QMainWindow):
             logo_label.setAlignment(Qt.AlignCenter)
         control_layout.addWidget(logo_label)
 
-        # Panel de control
         control_label = QLabel("Control Panel", self)
         control_label.setStyleSheet("""
             font-size: 16px;
@@ -49,7 +47,6 @@ class VideoProcessor(QMainWindow):
         control_label.setAlignment(Qt.AlignCenter)
         control_layout.addWidget(control_label)
 
-        # Configuración de botones
         buttons = [
             ('Alertas', '#E8D5C4'),
             ('Cambiar Horarios', '#E8D5C4'),
