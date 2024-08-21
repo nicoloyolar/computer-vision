@@ -15,3 +15,7 @@ try:
 except mysql.connector.Error as err:
     print(f"Error: {err}")
 
+finally:
+    if conn.is_connected():
+        conn.close()
+        print("Conexión cerrada")
