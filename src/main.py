@@ -1,6 +1,8 @@
+"""Este es el punto de entrada principal de la aplicación de Control de Calidad de choritos"""
+
+from PyQt5.QtWidgets import QApplication
 from interfazCv import VideoProcessor
 import sys
-from PyQt5.QtWidgets import QApplication
 
 def main():
     app = QApplication(sys.argv)

@@ -1,13 +1,12 @@
-import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import smtplib
 import random
 import time
 import json
 
 class correoReporte:
-    """Clase para envío de reportes por correo electrónico."""
-
+    """Esta clase permite el envío de mensajería mediante correo electrónico"""
     def __init__(self, config_path='config.json'):
         self.config_path = config_path
         self.creds = self.load_credentials()

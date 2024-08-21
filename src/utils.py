@@ -1,0 +1,1 @@
+"""En este archivo se declaran utilidades y funciones auxiliares"""
