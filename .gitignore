@@ -1,3 +1,6 @@
 # Archivos de configuración que deben ser ignorados
+
+/config/vpn_config.json
+/config/email_config.json
 config.py
 .env
