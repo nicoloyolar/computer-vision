@@ -1,6 +1,11 @@
 # Archivos de configuración que deben ser ignorados
-
+__pycache__/
 /config/vpn_config.json
 /config/email_config.json
 config.py
 .env
+*.pyc
+
+data/input/
+data/output/
+data/models/

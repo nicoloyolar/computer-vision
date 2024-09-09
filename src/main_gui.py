@@ -5,15 +5,25 @@ from PyQt5.QtGui import QImage, QPixmap, QIcon, QPainter, QPainterPath
 from PyQt5.QtCore import QTimer, Qt, QRectF
 
 class VideoProcessor(QMainWindow):
+    """ 
+        Esta clase genera una interfaz para el usuario GUI con el fin de monitorear y procesar la información para
+        el sistema de visión y conteo de choritos
+    """
     def __init__(self, rtsp_url, roi=None):
+        """Inicializa la URL del flujo de video RTSP y una ROI opcional"""
         super().__init__()
-        self.rtsp_url = rtsp_url
-        self.roi = roi
-        self.desired_width = 640
+        self.rtsp_url       = rtsp_url
+        self.roi            = roi
+        self.desired_width  = 640
         self.desired_height = 480
         self.init_ui()
 
     def init_ui(self):
+        """
+            Esta función inicializa la interfaz, establece la configuración de ciertos componentes
+            y de la ventana principal
+        """
+        
         self.setWindowTitle('Conteo productos/Control calidad')
         self.setWindowIcon(QIcon(self.get_icon_path()))
         self.setGeometry(100, 100, 800, 700)
@@ -21,17 +31,19 @@ class VideoProcessor(QMainWindow):
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
 
-        main_layout = QHBoxLayout()
-        control_layout = QVBoxLayout()
+        main_layout     = QHBoxLayout()
+        control_layout  = QVBoxLayout()
 
         logo_label = QLabel(self)
         pixmap = self.get_pixmap(self.get_icon_path(), 150, 75)
+        
         if pixmap:
             logo_label.setPixmap(pixmap)
             logo_label.setAlignment(Qt.AlignCenter)
         else:
             logo_label.setText("Logo no encontrado")
             logo_label.setAlignment(Qt.AlignCenter)
+        
         control_layout.addWidget(logo_label)
 
         control_label = QLabel("Control Panel", self)
@@ -44,6 +56,7 @@ class VideoProcessor(QMainWindow):
             margin-bottom: 20px;
             border-radius: 5px;
         """)
+        
         control_label.setAlignment(Qt.AlignCenter)
         control_layout.addWidget(control_label)
 
@@ -70,7 +83,6 @@ class VideoProcessor(QMainWindow):
 
         control_layout.addStretch()
 
-        
         mode_label = QLabel("Modo de Visualización:", self)
         mode_label.setStyleSheet("font-size: 14px; font-weight: bold;")
         control_layout.addWidget(mode_label)
@@ -81,7 +93,6 @@ class VideoProcessor(QMainWindow):
 
         main_layout.addLayout(control_layout)
 
-    
         self.video_label = QLabel(self)
         self.video_label.setFixedSize(self.desired_width, self.desired_height)
         self.video_label.setStyleSheet("background-color: black; border-radius: 15px; border: 2px solid #34495e;")
@@ -103,22 +114,30 @@ class VideoProcessor(QMainWindow):
         return None
 
     def conectar_camara(self):
-        self.cap = cv2.VideoCapture(self.rtsp_url)
-        if self.cap.isOpened():
+        try:
+            self.cap = cv2.VideoCapture(self.rtsp_url)
+            if not self.cap.isOpened():
+                raise ValueError("No se pudo abrir la cámara.")
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
             self.cap.set(cv2.CAP_PROP_FPS, 24)
             self.timer.start(30)
+        except Exception as e:
+            print(f"Error al conectar con la cámara: {e}")
 
     def update_frame(self):
-        ret, frame = self.cap.read()
-        if ret:
+        try:
+            ret, frame = self.cap.read()
+            if not ret:
+                raise ValueError("No se pudo leer el cuadro de la cámara.")
             frame = self.procesar_frame(frame)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame_resized = cv2.resize(frame, (self.desired_width, self.desired_height), interpolation=cv2.INTER_AREA)
             qt_image = QImage(frame_resized.data, frame_resized.shape[1], frame_resized.shape[0], QImage.Format_RGB888)
             rounded_pixmap = self.apply_rounded_corners(QPixmap.fromImage(qt_image), 15)
             self.video_label.setPixmap(rounded_pixmap)
+        except Exception as e:
+            print(f"Error al actualizar el cuadro: {e}")
 
     def procesar_frame(self, frame):
         if self.roi:
@@ -155,6 +174,6 @@ class VideoProcessor(QMainWindow):
         return rounded
 
     def closeEvent(self, event):
-        if self.cap:
+        if hasattr(self, 'cap') and self.cap is not None:
             self.cap.release()
         event.accept()
