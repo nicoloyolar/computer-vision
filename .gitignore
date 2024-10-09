@@ -11,3 +11,6 @@ data/output/
 data/models/
 
 datasets/*
+
+/proyecto_contador/__pycache__/
+/proyecto_contador/model_video/*
