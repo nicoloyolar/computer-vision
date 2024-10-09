@@ -9,3 +9,5 @@ config.py
 data/input/
 data/output/
 data/models/
+
+datasets/*
