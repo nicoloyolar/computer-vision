@@ -1,19 +1,16 @@
-# integrar base de datos    (cada una hora se envía el conteo a la BD)
-
+import os
+import time
+import random
+import cv2
+import numpy as np
+import json
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from video_stream import VideoStream
 from yolo_detection import YOLODetector
 from sort import Sort
 from path import MODEL_PATH, VIDEO_PATH
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import cv2
-import numpy as np
-import os
-import smtplib
-import random
-import time
-import json
-import threading
 
 class correoReporte:
     """Esta clase permite el envío de mensajería mediante correo electrónico"""
@@ -25,15 +22,13 @@ class correoReporte:
         self.conteo_total   = 0
 
     def load_credentials(self):
-        """Este método trae las credenciales desde el archivo de configuración para enviar mensajería por correo"""
+        """Este método carga las credenciales desde el archivo de configuración para enviar mensajería por correo"""
         try:
             with open(self.config_path) as f:
                 return json.load(f)
-            
         except FileNotFoundError:
             print(f"Error: El archivo de configuración '{self.config_path}' no se encontró.")
             raise
-        
         except json.JSONDecodeError:
             print(f"Error: El archivo de configuración '{self.config_path}' no se puede parsear.")
             raise
@@ -71,7 +66,19 @@ class correoReporte:
         
         except Exception as e:
             print(f"Error inesperado: {e}")
-            
+
+    def reportes(self, hora, conteo):
+        """Genera un reporte mediante correo electrónico para notificar cuántos paquetes han sido contabilizados en cierto horario"""
+        subject = f"Reporte conteo {hora} AM" if hora < 12 else f"Reporte conteo {hora % 12} PM"
+        body = f"Cantidad de paquetes contabilizados horario {hora} AM: {conteo}" if hora < 12 else f"Cantidad de paquetes contabilizados horario {hora % 12} PM: {conteo}"
+        return subject, body
+
+    def enviar_reporte_diario(self, conteo_total):
+        """Envía el reporte final al terminar el turno"""
+        final_subject = "Reporte final turno diurno 8 AM-18 PM"
+        final_body = f"Cantidad total de paquetes contabilizados en el turno diurno: {conteo_total}"
+        self.send_email(final_subject, final_body)
+
 class ObjectCounter:
     """Esta clase permite detectar, identificar, clasificar y contar distintos tipos de productos en una línea de producción mediante un sistema de visión artificial"""
     def __init__(self, model_path, video_path):
@@ -84,24 +91,13 @@ class ObjectCounter:
         self.stagnation_count       = 0
         self.sort_tracker           = Sort(max_age=3, min_hits=2, iou_threshold=0.3)
         self.counted_ids            = set()
-        self.reporter               = correoReporte() 
         self.object_classes         = {}
         self.object_scores          = {}
+        self.reporte                = correoReporte()  # Integración del sistema de correo
+        self.time_interval           = 60  # Intervalo de tiempo para el envío de correos (60 segundos)
 
-        threading.Thread(target=self.send_email_reports, daemon=True).start()
         self.check_files()
 
-    def send_email_reports(self):
-        """Este método envía reportes de conteo por correo cada hora"""
-        while True:
-            
-            subject = "Reporte de conteo de productos"
-            body = f"Conteo de 1kg: {self.product_count_1kg}\nConteo de 500grs: {self.product_count_500grs}\nEstancamientos: {self.stagnation_count}"
-            
-            self.reporter.send_email(subject, body)
-            
-            time.sleep(60)
-            
     def check_files(self):
         """Este método comprueba la existencia de los archivos especificados y lanza una excepción si alguno falla"""
         if not os.path.exists(self.model_path):
@@ -110,7 +106,7 @@ class ObjectCounter:
             raise FileNotFoundError(f"El video no se encuentra en {self.video_path}")
 
     def draw_label(self, frame, text, x, y, color=(0, 255, 255), bg_color=(0, 0, 0, 0.5)):
-        """Este método dibuja un cuadro de texto en el marco. Acepta el texto, las coordenadas y los colores de fondo y de texto"""
+        """Este método dibuja un cuadro de texto en el marco"""
         font_scale, font_thickness = 1.2, 3
         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
         box_coords = ((x, y), (x + text_size[0] + 10, y - text_size[1] - 10))
@@ -121,14 +117,8 @@ class ObjectCounter:
         """Este método destaca mensajes críticos en rojo"""
         self.draw_label(frame, text, x, y, color=(0, 0, 255), bg_color=(0, 0, 0, 0.7))
 
-    def start_video_from_minute(self, stream, minute):
-        """Este método permite comenzar la reproducción el video a partir de un minuto específico"""
-        fps = stream.cap.get(cv2.CAP_PROP_FPS)
-        start_frame = int(minute * 60 * fps)
-        stream.cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
-
     def count_products(self, track_id, label):
-        """Este método cuenta la cantidad de productos detectados, asegurándose de que no se cuenten dos veces"""
+        """Este método cuenta la cantidad de productos detectados"""
         if track_id not in self.counted_ids:
             self.counted_ids.add(track_id)
             if label == '1kg':
@@ -172,40 +162,55 @@ class ObjectCounter:
         cv2.line(frame, (0, self.counter_line_y), (frame.shape[1], self.counter_line_y), (0, 0, 255), 2)
         cv2.putText(frame, f'Paquetes de 1kg: {self.product_count_1kg}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 255), 3)
         cv2.putText(frame, f'Paquetes de 500grs: {self.product_count_500grs}', (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 255), 3)
-        cv2.putText(frame, f'Estancamientos: {self.stagnation_count}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+        cv2.putText(frame, f'Estancamiento: {self.stagnation_count}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+
+    def reset_count(self):
+        """Este método reinicia el conteo al finalizar un turno"""
+        self.product_count_1kg = 0
+        self.product_count_500grs = 0
+        self.stagnation_count = 0
+        self.counted_ids.clear()
+        print("Conteo reiniciado.")
 
     def run(self):
-        """Este es el método principal que gestiona el flujo del programa"""
-        stream = VideoStream(self.video_path)
-        if not stream.cap.isOpened():
-            return
-
+        """Este método ejecuta la captura de video y el conteo de productos"""
+        cap = VideoStream(self.video_path).start()
         detector = YOLODetector(self.model_path)
-        if detector is None:
-            return
-        
-        detector.confidence_threshold = 0.67
-        self.start_video_from_minute(stream, 1)
 
-        while stream.cap.isOpened():
-            ret, frame = stream.read_frame()
-            if not ret:
+        start_time = time.time()
+        while True:
+            frame = cap.read()
+            if frame is None:
                 break
 
             self.process_frame(frame, detector)
             self.display_info(frame)
 
-            cv2.imshow('YOLO SORT Real-Time Detection', cv2.resize(frame, None, fx=self.scale_factor, fy=self.scale_factor))
+            # Mostrar el cuadro
+            cv2.imshow("Conteo de productos", frame)
+
+            # Manejo de tiempo para enviar reportes
+            current_time = time.time()
+            elapsed_time = current_time - start_time
+
+            if elapsed_time >= self.time_interval:
+                hour = int((current_time // 3600) % 24)
+                subject, body = self.reporte.reportes(hour, self.product_count_1kg + self.product_count_500grs)
+                self.reporte.send_email(subject, body)
+                start_time = current_time
+
+            # Salir si se presiona 'q'
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        stream.release()
+        cap.stop()
         cv2.destroyAllWindows()
+        self.reporte.enviar_reporte_diario(self.product_count_1kg + self.product_count_500grs)
 
+# Llamar a la clase ObjectCounter y ejecutar el método run
 if __name__ == "__main__":
-    """Se crea una instancia de la clase principal y se ejecuta el método 'run'"""
     try:
-        counter = ObjectCounter(MODEL_PATH, VIDEO_PATH)
-        counter.run()
+        contador = ObjectCounter(MODEL_PATH, VIDEO_PATH)
+        contador.run()
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Ocurrió un error: {e}")

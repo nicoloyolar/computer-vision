@@ -3,6 +3,6 @@
     "smtp_port": 587,
     "smtp_username": "luis.san1501@alumnos.ubiobio.cl",
     "smtp_password": "llmw jcul mqzo vfid",
-    "destinatarios": ["paraglassccp@gmail.com", "sanmaglass@gmail.com"],
+    "destinatarios": ["paraglassccp@gmail.com", "sanmaglass@gmail.com", "nicolas.iloyolar@gmail.com"],
     "cc": ["luis.san1501@alumnos.ubiobio.cl"]
 }
